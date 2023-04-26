@@ -106,3 +106,12 @@ export const validateEmail = async (body) => {
     }
   }
 }
+export const forgetPassword = async (body) => {
+  try {
+    console.log("forget password", body)
+    var emailResponse = validateEmail(body);
+    return emailResponse;
+  } catch (err) {
+    throw new Error(err)
+  }
+}
