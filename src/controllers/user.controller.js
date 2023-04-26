@@ -28,7 +28,7 @@ export const getAllUsers = async (req, res, next) => {
  */
 export const getUser = async (req, res, next) => {
   try {
-    const data = await UserService.getUser(req.params.id);
+    const data = await UserService.getUser(req.body);
     res.status(HttpStatus.OK).json({
       code: HttpStatus.OK,
       data: data,
@@ -57,6 +57,44 @@ export const newUser = async (req, res, next) => {
     next(error);
   }
 };
+
+export const validateEmail=async(req,res,next)=>{
+  try {
+    const data = await UserService.validateEmail(req.body);
+    res.status(HttpStatus.CREATED).json({
+      code: HttpStatus.CREATED,
+      data: data,
+      message: 'Email Sent Successfully'
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export const forgetPassword=async(req,res,next)=>{
+  try {
+    const data = await UserService.forgetPassword(req.body);
+    res.status(HttpStatus.CREATED).json({
+      code: HttpStatus.CREATED,
+      data: data,
+      message: 'Email Sent Successfully'
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+export const resetPassword=async(req,res,next)=>{
+  try {
+    const data = await UserService.reset(req.body);
+    res.status(HttpStatus.CREATED).json({
+      code: HttpStatus.CREATED,
+      data: data,
+      message: 'Email Sent Successfully'
+    });
+  } catch (error) {
+    next(error);
+  }
+}
 
 /**
  * Controller to update a user
