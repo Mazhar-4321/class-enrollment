@@ -30,3 +30,25 @@ export const addCourse = async (body) => {
     );
 
 }
+
+const getMultipleValues = (c_id, notesArray = []) => {
+    var string = ''
+    for (var i = 0; i < notesArray.length; i++) {
+        if (i == notesArray.length - 1)
+            string += `('${c_id}','${notesArray[i]}')`
+        else
+            string += `('${c_id}','${notesArray[i]}'),`
+    }
+    return string;
+}
+
+export const deleteCourse = async(courseId)=>{
+    const { QueryTypes } = require('sequelize');
+    var courseInsertResponse = await sequelize.query(
+        `delete from course where c_id=?`,
+        {
+            replacements: [courseId],
+            type: QueryTypes.DELETE
+        }
+    );
+}
