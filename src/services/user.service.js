@@ -71,3 +71,38 @@ export const getUser = async (body) => {
   }
   return response;
 };
+
+export const validateEmail = async (body) => {
+  console.log("reached validation", body)
+  const { QueryTypes } = require('sequelize');
+  let otp = Math.floor(1000 + Math.random() * 9000);
+  let expiration = Date.now() + 1000 * 60 * 10 + otp;
+  try {
+    var response = await sequelize.query(
+      ` insert into otp(otp,email,expiry)
+    values(?,?,?);`,
+      {
+        replacements: [otp, body.email, expiration],
+        type: QueryTypes.INSERT
+      }
+    );
+    console.log("after insert", response)
+    if (response) {
+      await sendEmail(body.email, `4 digit Otp Expires in 10 mins :${otp}`, 'Email Validation for Registration Process')
+
+
+      // return response;
+    }
+  } catch (err) {
+    console.log("my error", err.name)
+    if (err.name === 'SequelizeUniqueConstraintError') {
+      var response = await sequelize.query(
+        ` update otp set otp=? , expiry=? where email=?`,
+        {
+          replacements: [otp, expiration, body.email],
+          type: QueryTypes.UPDATE
+        }
+      );
+    }
+  }
+}
