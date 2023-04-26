@@ -16,3 +16,30 @@ export const availableCourses = async () => {
     return response;
 
 }
+
+export const myCourses = async (email) => {
+    const { QueryTypes } = require('sequelize');
+    var response = await sequelize.query(`select c.name ,cn.notes ,ci.instructor 
+    ,c.lastDate ,
+     c.duration ,c.course_description 
+        from course c
+        inner join courses_enrolled ce
+        on c.c_id=ce.c_id
+        inner join course_instructor ci
+        on c.c_id=ci.c_id
+        inner join (select c_id,group_concat(notes) as notes from course_notes group by c_id order by c_id
+    ) cn
+        on cn.c_id=c.c_id
+        where ce.student_id='syedmazharali742@gmail.com'
+        and c.seatsLeft>0 
+    
+  `
+        , {
+            replacements: [email],
+            type: QueryTypes.SELECT
+        })
+    console.log("my Baby", response)
+   
+    return response;
+
+}
