@@ -68,3 +68,19 @@ export const updateProfile = async (body) => {
     return response;
 
 }
+export const enrollInCourse = async (body) => {
+    const { QueryTypes } = require('sequelize');
+    var response = await sequelize.query(`insert into courses_enrolled(c_id,student_id,status)
+    values(?,?,0)`
+        , {
+            replacements: [body.course_id, body.student_id],
+            type: QueryTypes.INSERT
+        })
+    if (response) {
+        return await sequelize.query(`update course set seatsLeft=seatsLeft-1 where c_id=?`
+            , {
+                replacements: [body.course_id],
+                type: QueryTypes.UPDATE
+            })
+    }
+}
