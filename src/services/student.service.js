@@ -43,3 +43,16 @@ export const myCourses = async (email) => {
     return response;
 
 }
+
+export const myProfile = async (body) => {
+    const { QueryTypes } = require('sequelize');
+    var response = await sequelize.query(`select firstName,lastName,email from users where 
+    email=?`
+        , {
+            replacements: [body.email],
+            type: QueryTypes.SELECT
+        })
+
+    return response;
+
+}
