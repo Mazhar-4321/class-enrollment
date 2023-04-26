@@ -56,3 +56,15 @@ export const myProfile = async (body) => {
     return response;
 
 }
+export const updateProfile = async (body) => {
+    const { QueryTypes } = require('sequelize');
+    var response = await sequelize.query(`update users set firstName=?,lastName=? where 
+    email=?`
+        , {
+            replacements: [body.firstName, body.lastName, body.email],
+            type: QueryTypes.SELECT
+        })
+
+    return response;
+
+}
