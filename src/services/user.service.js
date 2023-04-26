@@ -115,3 +115,23 @@ export const forgetPassword = async (body) => {
     throw new Error(err)
   }
 }
+export const reset = async (body) => {
+  const { QueryTypes } = require('sequelize');
+  const expiry = Date.now();
+  var otpResponse = await sequelize.query('select * from otp where otp=? and email=? and expiry>=?'
+    , {
+      replacements: [body.otp, body.email, expiry],
+      type: QueryTypes.SELECT
+    })
+  console.log("otpResponse", otpResponse)
+  if (otpResponse.length > 0) {
+    var response = await sequelize.query(
+      ` update users set password=? where email=?;`,
+      {
+        replacements: [body.password, body.email],
+        type: QueryTypes.UPDATE
+      }
+    );
+  }
+
+}
