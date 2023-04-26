@@ -1,34 +1,43 @@
-import sequelize, { DataTypes } from '../config/database';
-const User = require('../models/user')(sequelize, DataTypes);
+import sequelize from '../config/database';
+import { sendEmail } from '../utils/user.util';
+import Jwt from 'jsonwebtoken';
+const bcrypt = require('bcrypt');
 
-//get all users
-export const getAllUsers = async () => {
-  const data = await User.findAll();
-  return data;
-};
 
-//create new user
+
+
 export const newUser = async (body) => {
-  const data = await User.create(body);
-  return data;
-};
 
-//update single user
-export const updateUser = async (id, body) => {
-  await User.update(body, {
-    where: { id: id }
-  });
-  return body;
-};
+  const { QueryTypes } = require('sequelize');
+  const expiry = Date.now();
+  var otpResponse = await sequelize.query('select * from otp where otp=? and email=? and expiry>=?'
+    , {
+      replacements: [body.otp, body.email, expiry],
+      type: QueryTypes.SELECT
+    })
+  console.log("otpResponse", otpResponse)
+  if (otpResponse.length > 0) {
+    body.password = bcrypt.hashSync(body.password, 10);
+    var childTable = await sequelize.query(
+      `insert into role(email,role_name)
+  values(?,?)`,
+      {
+        replacements: [body.email, body.role],
+        type: QueryTypes.INSERT
+      }
+    );
+    var response = await sequelize.query(
+      `insert into users(firstName,lastName,email,password)
+  values(?,?,?,?)`,
+      {
+        replacements: [body.firstName, body.lastName, body.email, body.password],
+        type: QueryTypes.INSERT
+      }
+    );
+    console.log(response)
+    return response;
+  } else {
 
-//delete single user
-export const deleteUser = async (id) => {
-  await User.destroy({ where: { id: id } });
-  return '';
-};
-
-//get single user
-export const getUser = async (id) => {
-  const data = await User.findByPk(id);
-  return data;
+    throw new Error('Invalid OTP')
+  }
 };
